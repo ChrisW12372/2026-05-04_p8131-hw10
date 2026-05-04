@@ -1,0 +1,82 @@
+---
+title: "2026-05-04_hw10"
+author: "Chris"
+date: "2026-05-04"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+    theme: cosmo
+    css: style.css
+---
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(survival)
+```
+
+
+
+# Problem One
+
+```{r}
+time <- c(4, 12, 15, 21, 23, 2, 6, 8, 10, 19)
+
+status <- c(1, 0, 1, 0, 1, 1, 0, 0, 1, 1)
+
+group <- c(rep(1, 5), rep(2, 5))
+
+dat <- data.frame(time, status, group)
+
+dat
+```
+
+
+```{r}
+fit1 <- survdiff(Surv(time, status) ~ group, data = dat)
+fit1
+```
+
+Since the p-value = $0.3 > 0.05$, we are incline to believe that there is not enough evidence to conclude the survival functions differ between two groups. Since the $H_0: h_1(t) = h_2(t)$ is equivalent to $S_1(t) = S_2(t)$, we don't have enough evidence to reject the null hypothesis.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
