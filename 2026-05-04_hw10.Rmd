@@ -15,6 +15,7 @@ output:
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(survival)
+library(KMsurv)
 ```
 
 
@@ -43,12 +44,61 @@ Since the p-value = $0.3 > 0.05$, we are incline to believe that there is not en
 
 
 
+# Problem Two
 
 
+```{r}
+data("kidtran")
+```
 
 
+```{r}
+# male: gender = 1
+fit_male <- survfit(Surv(time, delta) ~ race, 
+                    data = kidtran, 
+                    subset = gender == 1)
+
+plot(fit_male, 
+     col = c("blue", "red"),
+     xlab = "Time",
+     ylab = "Survival probability",
+     main = "KM curves by race among males")
+
+legend("bottomleft",
+       legend = c("White", "Black"),
+       col = c("blue", "red"),
+       lty = 1)
+
+survdiff(Surv(time, delta) ~ race, 
+         data = kidtran, 
+         subset = gender == 1)
+```
 
 
+```{r}
+# female: gender = 2
+fit_female <- survfit(Surv(time, delta) ~ race, 
+                      data = kidtran, 
+                      subset = gender == 2)
+
+plot(fit_female, 
+     col = c("blue", "red"),
+     xlab = "Time",
+     ylab = "Survival probability",
+     main = "KM curves by race among females")
+
+legend("bottomleft",
+       legend = c("White", "Black"),
+       col = c("blue", "red"),
+       lty = 1)
+
+survdiff(Surv(time, delta) ~ race, 
+         data = kidtran, 
+         subset = gender == 2)
+```
+
+
+The racial difference in survival appears to depend on sex. Among males, the survival curves for white and black patients are very similar. Among females, however, black patients appear to have lower survival probabilities than white patients, especially after approximately 900 days of follow-up.  
 
 
 
