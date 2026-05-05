@@ -1505,6 +1505,7 @@ border-radius: 0px;
 </div>
 
 
+<p>The project is on GitHub: <a href="https://github.com/ChrisW12372/2026-05-04_p8131-hw10.git" class="uri">https://github.com/ChrisW12372/2026-05-04_p8131-hw10.git</a></p>
 <pre class="r"><code>library(tidyverse)
 library(survival)
 library(KMsurv)</code></pre>
@@ -1611,6 +1612,130 @@ males, the survival curves for white and black patients are very
 similar. Among females, however, black patients appear to have lower
 survival probabilities than white patients, especially after
 approximately 900 days of follow-up.</p>
+</div>
+<div id="problem-three" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Problem Three</h1>
+<pre class="r"><code>data(&quot;larynx&quot;)</code></pre>
+<pre class="r"><code>larynx$Z1 &lt;- ifelse(larynx$stage == 2, 1, 0)
+larynx$Z2 &lt;- ifelse(larynx$stage == 3, 1, 0)
+larynx$Z3 &lt;- ifelse(larynx$stage == 4, 1, 0)
+larynx$Z4 &lt;- larynx$age
+
+fit3 &lt;- coxph(
+  Surv(time, delta) ~ Z1 + Z2 + Z3 + Z4 + Z1:Z4,
+  data = larynx
+)
+
+summary(fit3)</code></pre>
+<pre><code>## Call:
+## coxph(formula = Surv(time, delta) ~ Z1 + Z2 + Z3 + Z4 + Z1:Z4, 
+##     data = larynx)
+## 
+##   n= 90, number of events= 50 
+## 
+##             coef  exp(coef)   se(coef)      z Pr(&gt;|z|)    
+## Z1    -7.4898902  0.0005587  3.4169200 -2.192   0.0284 *  
+## Z2     0.6251294  1.8684878  0.3558360  1.757   0.0790 .  
+## Z3     1.7681449  5.8599725  0.4237680  4.172 3.01e-05 ***
+## Z4     0.0060299  1.0060481  0.0148750  0.405   0.6852    
+## Z1:Z4  0.1133273  1.1199985  0.0478711  2.367   0.0179 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+##       exp(coef) exp(-coef) lower .95 upper .95
+## Z1    0.0005587  1789.8556 6.898e-07    0.4526
+## Z2    1.8684878     0.5352 9.303e-01    3.7530
+## Z3    5.8599725     0.1706 2.554e+00   13.4464
+## Z4    1.0060481     0.9940 9.771e-01    1.0358
+## Z1:Z4 1.1199985     0.8929 1.020e+00    1.2302
+## 
+## Concordance= 0.682  (se = 0.04 )
+## Likelihood ratio test= 24.49  on 5 df,   p=2e-04
+## Wald test            = 24.14  on 5 df,   p=2e-04
+## Score (logrank) test = 28.49  on 5 df,   p=3e-05</code></pre>
+<pre class="r"><code>coef_fit &lt;- coef(fit3)
+
+RR_50 &lt;- exp(coef_fit[&quot;Z1&quot;] + 50 * coef_fit[&quot;Z1:Z4&quot;])
+
+RR_50</code></pre>
+<pre><code>##        Z1 
+## 0.1614558</code></pre>
+<p>A Cox proportional hazards model was fitted with indicators for stage
+II, stage III, and stage IV, age, and an interaction between stage II
+and age. The fitted model is</p>
+<p><span class="math display">\[
+\hat h(t \mid Z)
+=
+\hat h_0(t)
+\exp\left(
+-7.4899Z_1
++0.6251Z_2
++1.7681Z_3
++0.0060Z_4
++0.1133Z_1Z_4
+\right).
+\]</span></p>
+<p>The overall model is statistically significant based on the
+likelihood ratio test, Wald test, and score test:</p>
+<p><span class="math display">\[
+\text{Likelihood ratio test}=24.49, \quad p=2\times 10^{-4},
+\]</span></p>
+<p><span class="math display">\[
+\text{Wald test}=24.14, \quad p=2\times 10^{-4},
+\]</span></p>
+<p>and</p>
+<p><span class="math display">\[
+\text{Score log-rank test}=28.49, \quad p=3\times 10^{-5}.
+\]</span></p>
+<p>Thus, there is evidence that at least one of the covariates is
+associated with the hazard of death.</p>
+<p>Stage IV is significantly associated with a higher hazard of death
+compared with stage I. The estimated hazard ratio is</p>
+<p><span class="math display">\[
+HR_{\text{stage IV vs stage I}}
+=
+\exp(1.7681)
+=
+5.8600.
+\]</span></p>
+<p>Stage III has an estimated hazard ratio of</p>
+<p><span class="math display">\[
+HR_{\text{stage III vs stage I}}
+=
+\exp(0.6251)
+=
+1.8685,
+\]</span></p>
+<p>but this effect is not statistically significant at the 0.05
+level.</p>
+<p>Because the model includes an interaction term between stage II and
+age, the effect of stage II relative to stage I depends on age. For a
+patient aged <span class="math inline">\(a\)</span>, the hazard ratio
+comparing stage II with stage I is</p>
+<p><span class="math display">\[
+HR_{\text{stage II vs stage I at age }a}
+=
+\exp(\hat\beta_1+a\hat\beta_5).
+\]</span></p>
+<p>Using the fitted coefficients, this becomes</p>
+<p><span class="math display">\[
+HR_{\text{stage II vs stage I at age }a}
+=
+\exp(-7.4899+0.1133a).
+\]</span></p>
+<p>Therefore, for a 50-year-old stage II patient compared with a
+50-year-old stage I patient, the estimated relative risk of dying is</p>
+<p><span class="math display">\[
+RR
+=
+\exp(-7.4899+50\times 0.1133)
+=
+\exp(-1.8249)
+\approx 0.161.
+\]</span></p>
+<p>Thus, according to this fitted model, a 50-year-old stage II patient
+has about 0.161 times the hazard of death of a 50-year-old stage I
+patient.</p>
 </div>
 
 
